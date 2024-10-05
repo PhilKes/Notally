@@ -60,6 +60,12 @@ class ListItemSortedList(callback: Callback<ListItem>) :
         return removedItem
     }
 
+    override fun addAll(items: Array<out ListItem>, mayModifyInput: Boolean) {
+        val initializedItems = items.toList()
+        initList(initializedItems)
+        super.addAll(initializedItems.toTypedArray(), mayModifyInput)
+    }
+
     private fun separateChildrenFromParent(item: ListItem) {
         findParent(item)?.let { (_, parent) ->
             val childIndex = parent.children.indexOfFirst { child -> child.id == item.id }
@@ -93,11 +99,45 @@ class ListItemSortedList(callback: Callback<ListItem>) :
         }
     }
 
-    fun initializeChildren() {
-        this.forEach {
-            if (it.isChild) {
-                updateChildInParent(it.order!!, it)
+    private fun initList(list: List<ListItem>) {
+        initOrders(list)
+        initChildren(list)
+    }
+
+    private fun initChildren(list: List<ListItem>) {
+        var parent: ListItem? = null
+        list.forEach { item ->
+            if (item.isChild) {
+                parent!!.children.add(item)
+            } else {
+                parent = item
             }
+        }
+    }
+
+    /** Makes sure every [ListItem.order] is valid and correct */
+    private fun initOrders(list: List<ListItem>): Boolean {
+        var orders = list.map { it.order }.toMutableList()
+        var invalidOrderFound = false
+        list.forEachIndexed { idx, item ->
+            if (item.order == null || orders.count { it == idx } > 1) {
+                invalidOrderFound = true
+                if (orders.contains(idx)) {
+                    shiftAllOrdersAfterItem(list, item)
+                }
+                item.order = idx
+                orders = list.map { it.order }.toMutableList()
+            }
+        }
+        return invalidOrderFound
+    }
+
+    private fun shiftAllOrdersAfterItem(list: List<ListItem>, item: ListItem) {
+        // Move all orders after the item to ensure no duplicate orders
+        val sortedByOrders = list.sortedBy { it.order }
+        val position = sortedByOrders.indexOfFirst { it.id == item.id }
+        for (i in position + 1..sortedByOrders.lastIndex) {
+            sortedByOrders[i].order = sortedByOrders[i].order!! + 1
         }
     }
 

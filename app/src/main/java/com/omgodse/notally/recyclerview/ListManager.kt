@@ -350,7 +350,6 @@ class ListManager(
     fun initList(items: ListItemSortedList) {
         this.items = items
         this.items.forEachIndexed { index, item -> item.id = index }
-        this.items.initializeChildren()
         nextItemId = this.items.size()
         Log.d(TAG, "initList:\n${this.items.toReadableString()}")
     }
