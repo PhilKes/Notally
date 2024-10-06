@@ -68,6 +68,36 @@ open class ListItemSortedListTest {
         assertOrders(0, 1, 2, 3, 4, 5)
     }
 
+    @Test
+    fun `init with checked items`() {
+        items.addAll(
+            createListItem("D", id = 3, order = 3),
+            createListItem("E", id = 4, order = 4),
+            createListItem("F", id = 5, order = 5),
+            createListItem("A", id = 0, order = 0, checked = true),
+            createListItem("B", id = 1, order = 1, checked = true, isChild = true),
+            createListItem("C", id = 2, order = 2, checked = true, isChild = true),
+        )
+
+        items.assertOrder("D", "E", "F", "A", "B", "C")
+        assertOrders(3, 4, 5, 0, 1, 2)
+    }
+
+    @Test
+    fun `init with unordered checked items`() {
+        items.addAll(
+            createListItem("A", id = 0, order = 0, checked = true),
+            createListItem("B", id = 1, order = 1, checked = true, isChild = true),
+            createListItem("C", id = 2, order = 2, checked = true, isChild = true),
+            createListItem("D", id = 3, order = 3),
+            createListItem("E", id = 4, order = 4),
+            createListItem("F", id = 5, order = 5),
+        )
+
+        items.assertOrder("D", "E", "F", "A", "B", "C")
+        assertOrders(3, 4, 5, 0, 1, 2)
+    }
+
     private fun assertOrders(vararg orders: Int) {
         for (idx in 0 until orders.size) {
             assertEquals(orders[idx], items[idx].order)

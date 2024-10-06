@@ -63,7 +63,11 @@ class ListItemSortedList(callback: Callback<ListItem>) :
     override fun addAll(items: Array<out ListItem>, mayModifyInput: Boolean) {
         val initializedItems = items.toList()
         initList(initializedItems)
-        super.addAll(initializedItems.toTypedArray(), mayModifyInput)
+        val (children, parents) = initializedItems.partition { it.isChild }
+        // Add parents first, because if auto-sort is enabled sorting children needs the parents to
+        // be present already
+        super.addAll(parents.toTypedArray(), mayModifyInput)
+        super.addAll(children.toTypedArray(), mayModifyInput)
     }
 
     private fun separateChildrenFromParent(item: ListItem) {
