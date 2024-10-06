@@ -23,7 +23,7 @@ open class ListItemSortedListTest {
 
     @Test
     fun `init fixes null order values`() {
-        items.addAll(
+        items.init(
             createListItem("A", id = 0, order = null),
             createListItem("B", id = 1, order = null),
             createListItem("C", id = 2, order = 2),
@@ -40,7 +40,7 @@ open class ListItemSortedListTest {
 
     @Test
     fun `init fixes duplicate order values`() {
-        items.addAll(
+        items.init(
             createListItem("A", id = 0, order = 0),
             createListItem("B", id = 1, order = 1),
             createListItem("C", id = 2, order = 1),
@@ -55,7 +55,7 @@ open class ListItemSortedListTest {
 
     @Test
     fun `init with unordered input`() {
-        items.addAll(
+        items.init(
             createListItem("A", id = 0, order = 0),
             createListItem("F", id = 5, order = 5),
             createListItem("D", id = 3, order = 3),
@@ -70,7 +70,7 @@ open class ListItemSortedListTest {
 
     @Test
     fun `init with checked items`() {
-        items.addAll(
+        items.init(
             createListItem("D", id = 3, order = 3),
             createListItem("E", id = 4, order = 4),
             createListItem("F", id = 5, order = 5),
@@ -85,7 +85,7 @@ open class ListItemSortedListTest {
 
     @Test
     fun `init with unordered checked items`() {
-        items.addAll(
+        items.init(
             createListItem("A", id = 0, order = 0, checked = true),
             createListItem("B", id = 1, order = 1, checked = true, isChild = true),
             createListItem("C", id = 2, order = 2, checked = true, isChild = true),

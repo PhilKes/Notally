@@ -3,7 +3,7 @@ package com.omgodse.notally.sorting
 import androidx.recyclerview.widget.SortedList
 import com.omgodse.notally.model.ListItem
 
-class ListItemSortedList(callback: Callback<ListItem>) :
+class ListItemSortedList(private val callback: Callback<ListItem>) :
     SortedList<ListItem>(ListItem::class.java, callback) {
 
     override fun updateItemAt(index: Int, item: ListItem?) {
@@ -60,14 +60,21 @@ class ListItemSortedList(callback: Callback<ListItem>) :
         return removedItem
     }
 
-    override fun addAll(items: Array<out ListItem>, mayModifyInput: Boolean) {
+    fun init(items: Collection<ListItem>) {
         val initializedItems = items.toList()
         initList(initializedItems)
-        val (children, parents) = initializedItems.partition { it.isChild }
-        // Add parents first, because if auto-sort is enabled sorting children needs the parents to
-        // be present already
-        super.addAll(parents.toTypedArray(), mayModifyInput)
-        super.addAll(children.toTypedArray(), mayModifyInput)
+        if (callback is ListItemSortedByCheckedCallback) {
+            val (children, parents) = initializedItems.partition { it.isChild }
+            // Need to use replaceAll for auto-sorting checked items
+            super.replaceAll(parents.toTypedArray(), false)
+            super.addAll(children.toTypedArray(), false)
+        } else {
+            super.addAll(initializedItems.toTypedArray(), false)
+        }
+    }
+
+    fun init(vararg items: ListItem) {
+        init(items.toList())
     }
 
     private fun separateChildrenFromParent(item: ListItem) {
@@ -104,6 +111,7 @@ class ListItemSortedList(callback: Callback<ListItem>) :
     }
 
     private fun initList(list: List<ListItem>) {
+        list.forEachIndexed { index, item -> item.id = index }
         initOrders(list)
         initChildren(list)
     }
